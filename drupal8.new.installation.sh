@@ -294,3 +294,4 @@ printf "${PURPLE}-------------------------------------${CN}\n"
 printf "${BLUE}\n Script started in :${CN} ${START_TIME}\n"
 printf "${BLUE} Script finished in:${CN} $(date +%H:%M:%S)\n\n"
 printf "${YELLOW} -- End of Drupal 8 installation. Bye. --\n\n\n${CN}"
+exit 0
