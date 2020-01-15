@@ -224,7 +224,7 @@ while true; do
             read -s -p " > " ADMIN_PASSWORD
             printf "\n${GREEN} Enter ${YELLOW}SITE NAME${GREEN} for this project:${CN}\n"
             read -p " > " SITE_NAME
-            drush si --locale=cs --site-name=${SITE_NAME} --account-name=${ADMIN_NAME} --account-pass=${ADMIN_PASSWORD} --db-url=mysql://${USER}:${PASSWORD}@${HOST_IP}:${PORT}/${DB_NAME} &&
+            drush si --site-name=${SITE_NAME} --account-name=${ADMIN_NAME} --account-pass=${ADMIN_PASSWORD} --db-url=mysql://${USER}:${PASSWORD}@${HOST_IP}:${PORT}/${DB_NAME} &&
             break ;;
         [Nn]* ) break ;;
         * ) printf "${RED}\n Please enter y|Y or n|N.${CN}\n\n" ;;
