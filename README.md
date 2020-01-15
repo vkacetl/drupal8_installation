@@ -1,4 +1,4 @@
-# drupal8_installation
+# Drupal 8 - installation
 
 Bash script for easy Drupal8 installation with database, some modules and themes.
 
