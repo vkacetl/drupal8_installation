@@ -43,7 +43,7 @@ MODULES=(
     "layout_builder_kit" \
     "ds" \
     "token" \
-    "pathauto" \
+    "pathauto:^1.6" \
     "antibot" \
     "allowed_formats" \
     "anchor_link" \
@@ -90,10 +90,11 @@ MODULES=(
     "twig_xdebug" \
     "file_permissions" \
     "paragraphs" \
+    "webform:^5.6" \
 )
-printf "\n\n${BLUE} =====================================================\n"
-printf "  ${CYAN}CMS Drupal 8 installation using Composer and Drush${BLUE}\n"
-printf " =====================================================\n"
+printf "\n\n${BLUE} ==================================================\n"
+printf "  ${CYAN}CMS Drupal 8 installation use Composer and Drush${BLUE}\n"
+printf " ==================================================\n"
 printf "                 version: 0.1.0        \n\n"
 printf "                      ';               \n"
 printf "                      oOx;             \n"
@@ -111,15 +112,21 @@ printf "               ;'   ;dkOxc.  .kd'      \n"
 printf "                            .,.        \n"
 printf "                                       ${CN}\n"
 # Drupal 8 core installation
-printf "${CYAN} This script will install DRUPAL 8's filesystem, database,\n"
-printf " some modules, themes and create GIT repository with Devel branch.${CN}\n\n"
-printf "\n        =============================\n"
-printf "        ${YELLOW}1. DRUPAL 8 CORE INSTALLATION${CN}\n"
-printf "        =============================\n"
-printf "\n"
+printf "${CYAN} This script will install DRUPAL 8's filesystem,\n"
+printf " some modules, database, Zurb theme and create\n"
+printf " GIT repository with checkout to new Devel branch.\n\n"
+printf " New project will be installed in the CURRENT directory.\n"
+printf " It's must be empty.${CN}\n\n"
+printf " 1. >> New Drupal 8 core installation\n"
+printf "${BLUE} 2. Installatin of more modules\n"
+printf " 3. Setup Drupal 8 database and backup it\n"
+printf " 4. Create GIT repository with new branch${CN}\n\n"
+
 # Question for project directory:
 while true; do
-    printf "${GREEN} Are you in the directory, \n where you want to create the new project?${CN} [y|n]:\n"
+    printf "${GREEN} Are you in this directory:${CN}\n\n"
+    printf "${YELLOW} $(pwd)\n\n"
+    printf "${GREEN} Do you want to create the new Drupal 8 project here?${CN} [y|n]:\n"
     read -p " > " yn
     case $yn in
         [Yy]* )
@@ -131,17 +138,19 @@ while true; do
             printf "\n${RED} Please enter y|Y or n|N.${CN}" ;;
     esac
 done
-printf "${GREEN} Please, enter a project directory name: ${CN}\n"
+printf "${GREEN} Please, enter a project name: ${CN}\n"
 read -p " > "  PROJECTNAME
 printf "\n${YELLOW} Install project Drupal 8 to directory: ${CYAN}${PROJECTNAME}/${YELLOW}.${CN}\n"
 printf "\n${BLUE} Download and install new Drupal 8 core...${CN}\n\n"
-composer create-project drupal-composer/drupal-project:8.x-dev ${PROJECTNAME} --no-interaction &&
-printf "\n\n${YELLOW} The project >>${CYAN} ${PROJECTNAME} ${YELLOW}<< has been installed.${CN}\n"
-cd ${PROJECTNAME}
+COMPOSER_MEMORY_LIMIT=-1 composer create-project drupal-composer/drupal-project:8.x-dev ${PROJECTNAME} &&
+printf "\n\n${YELLOW} The project >>${CYAN} ${PROJECTNAME} ${YELLOW}<< has been installed.${CN}\n\n"
+#cd ${PROJECTNAME}
+
 # Question of modules installation
-printf "\n\n         ================================\n"
-printf "${YELLOW}          2. Custom modules installation${CN}\n"
-printf "         ================================\n"
+printf "\n${BLUE} 1. New Drupal 8 core installation\n"
+printf "${WHITE} 2. >> Installatin of more modules${BLUE}\n"
+printf " 3. Setup Drupal 8 database and backup it\n"
+printf " 4. Create GIT repository with new branch${CN}\n\n"
 printf "\n\n${GREEN}    Select the modules which you want to install:${CN}\n"
 printf "    ---------------------------------------------\n"
 for item in ${MODULES[*]}
@@ -197,9 +206,10 @@ chmod -R 777 config &&
 printf "\n"
 printf "\n${GREEN} Set parameter: ${CN}[update_free_access] ${GREEN}in ${BLUE}settings.php ${GREEN}file to${CN} TRUE\n"
 sed -i -e "s/access'] = FALSE/access'] = TRUE/g" web/sites/default/settings.php &&
-printf "\n\n         ============================\n"
-printf "${YELLOW}          3. DRUPAL 8 DATABASE SETUP${CN}\n"
-printf "         ============================\n\n"
+printf "\n${BLUE} 1. New Drupal 8 core installation\n"
+printf " 2. Installatin of more modules\n"
+printf "${WHITE} 3. >> Setup Drupal 8 database and backup it${BLUE}\n"
+printf " 4. Create GIT repository with new branch${CN}\n\n"
 while true; do
     printf "${GREEN} Do you want create a new database for this project?${CN} [y|n]:\n"
     read -p " > " yn
@@ -224,7 +234,7 @@ while true; do
             read -s -p " > " ADMIN_PASSWORD
             printf "\n${GREEN} Enter ${YELLOW}SITE NAME${GREEN} for this project:${CN}\n"
             read -p " > " SITE_NAME
-            drush si --site-name=${SITE_NAME} --account-name=${ADMIN_NAME} --account-pass=${ADMIN_PASSWORD} --db-url=mysql://${USER}:${PASSWORD}@${HOST_IP}:${PORT}/${DB_NAME} &&
+            drush si --locale=cs --site-name=${SITE_NAME} --account-name=${ADMIN_NAME} --account-pass=${ADMIN_PASSWORD} --db-url=mysql://${USER}:${PASSWORD}@${HOST_IP}:${PORT}/${DB_NAME} &&
             break ;;
         [Nn]* ) break ;;
         * ) printf "${RED}\n Please enter y|Y or n|N.${CN}\n\n" ;;
@@ -239,6 +249,8 @@ drush en webprofiler --no-interaction &&
 printf "\n${BLUE} Enable other important modules:${CN}\n\n"
 drush en module_filter &&
 sleep 2
+drush en backup_migrate &&
+sleep 2
 drush en libraries &&
 sleep 2
 drush en coffee &&
@@ -249,19 +261,25 @@ drush en admin_toolbar_tools &&
 sleep 2
 drush en adminimal_admin_toolbar &&
 sleep 2
+drush en webform &&
+sleep 2
 printf "\n${BLUE} Enable adminimal theme:${CN}\n\n"
 drush then adminimal_theme &&
 printf "\n${BLUE} Enable zurb_foundation theme:${CN}\n\n"
 drush then zurb_foundation &&
 printf "\n${GREEN} Set permissins for ${BLUE}settings.php${GREEN} file.${CN}\n"
 chmod 664 sites/default/settings.php &&
+printf "\n${GREEN} composer update${CN}\n"
+chmod 755 sites/default/ &&
+composer update &&
 printf "\n${GREEN} Dump ${DB_NAME} database\n"
 mysqldump -u ${USER} -p${PASSWORD} --port ${PORT} -h ${HOST_IP} ${DB_NAME} > ../../$(date +%e-%m-%Y-%H:%M:%S)_${DB_NAME}_backup.sql &&
 cd ../
-printf "\n\n         ============================\n"
-printf "${YELLOW}          4. Create a GIT repository${CN}\n"
-printf "         ============================\n"
-printf "\n\n${BLUE}    creates a \"Devel\" branch and checkout into it${CN}\n"
+printf "\n${BLUE} 1. New Drupal 8 core installation\n"
+printf " 2. Installatin of more modules\n"
+printf " 3. Setup Drupal 8 database and backup it\n"
+printf "${WHITE} 4. >> Create GIT repository with new branch${BLUE}\n\n"
+printf "\n\n    creates a \"Devel\" branch and checkout into it${CN}\n"
 printf "    ---------------------------------------------\n\n"
 while true; do
     printf "${GREEN} Do you want initialize your new GIT repository?${CN} [y|n]:\n"
@@ -295,3 +313,6 @@ printf "${BLUE}\n Script started in :${CN} ${START_TIME}\n"
 printf "${BLUE} Script finished in:${CN} $(date +%H:%M:%S)\n\n"
 printf "${YELLOW} -- End of Drupal 8 installation. Bye. --\n\n\n${CN}"
 exit 0
+
+
+
