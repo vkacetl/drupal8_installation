@@ -20,6 +20,6 @@ Sections:
 5. Dump new database
 6. Create git repository with new "Devel" branch and checkout into.
 
-For Windows 10 - rename this script with suffix *.ps1 instead of *.sh
+For Windows 10 - rename this script with suffix *.ps1 instead of *.sh (- not tested)
 
 Tested on Gentoo.
