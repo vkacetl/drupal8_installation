@@ -22,4 +22,4 @@ Sections:
 
 For Windows 10 - rename this script with suffix *.ps1 instead of *.sh
 
-Tested with gentoo.
+Tested on Gentoo.
